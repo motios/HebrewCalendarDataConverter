@@ -3,40 +3,49 @@ package hebcalgroupid.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by We on 11.11.2016.
  */
 public class MonthModel implements Serializable {
-    private List<DayModel> days;
-    private Date date;
+    private HashMap<Integer, DayModel> days;
+    private int monthInt;
 
     public MonthModel() {
-        days= new ArrayList<>();
-
+        days= new HashMap<>();
     }
 
-    public List<DayModel> getDays() {
+    public MonthModel(int monthInt) {
+        this();
+        this.monthInt=monthInt;
+    }
+
+    public int getMonthInt() {
+        return monthInt;
+    }
+
+    public void setMonthInt(int monthInt) {
+        this.monthInt = monthInt;
+    }
+
+    public HashMap<Integer, DayModel> getDays() {
         return days;
     }
 
-    ///add unique daymodel into list
-    public void addDayModel(DayModel dayModel){
-        if(!days.contains(dayModel)){
-            days.add(dayModel);
-        }
-    }
-
-    public void setDays(List<DayModel> days) {
+    public void setDays(HashMap<Integer, DayModel> days) {
         this.days = days;
     }
 
-    public Date getDate() {
-        return date;
+    ///add unique daymodel into list
+    public void addDayModel(int dayInt, DayModel dayModel){
+        days.put(dayInt,dayModel);
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public DayModel getDay(int dayInt){
+        return days.get(dayInt);
     }
+
+
 }

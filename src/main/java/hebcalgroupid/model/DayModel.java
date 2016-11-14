@@ -10,6 +10,7 @@ public class DayModel implements Serializable {
 
 
 
+    private int dayNumber;
     private String dateGregorian;
     private String hebrewDate;
     private String titleEnglishDateHebrewCalendar;
@@ -65,6 +66,14 @@ public class DayModel implements Serializable {
         this.yomtov = yomtov;
     }
 
+    public int getDayNumber() {
+        return dayNumber;
+    }
+
+    public void setDayNumber(int dayNumber) {
+        this.dayNumber = dayNumber;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -72,19 +81,23 @@ public class DayModel implements Serializable {
 
         DayModel dayModel = (DayModel) o;
 
+        if (dayNumber != dayModel.dayNumber) return false;
+        if (yomtov != dayModel.yomtov) return false;
         if (!dateGregorian.equals(dayModel.dateGregorian)) return false;
         if (!hebrewDate.equals(dayModel.hebrewDate)) return false;
-        if (!titleEnglishDateHebrewCalendar.equals(dayModel.titleEnglishDateHebrewCalendar)) return false;
-        return category.equals(dayModel.category);
+        return titleEnglishDateHebrewCalendar.equals(dayModel.titleEnglishDateHebrewCalendar) && category.equals(dayModel.category);
 
     }
 
     @Override
     public int hashCode() {
-        int result = dateGregorian.hashCode();
+        int result = dayNumber;
+        result = 31 * result + dateGregorian.hashCode();
         result = 31 * result + hebrewDate.hashCode();
         result = 31 * result + titleEnglishDateHebrewCalendar.hashCode();
         result = 31 * result + category.hashCode();
+        result = 31 * result + (yomtov ? 1 : 0);
         return result;
     }
 }
+

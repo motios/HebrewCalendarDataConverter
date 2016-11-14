@@ -30,7 +30,7 @@ public class RestConnector {
         //HttpGet request = new HttpGet("http://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&year=1975&month=4&d=on&D=on");
         HttpResponse response = client.execute(request);
         BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
-        String line = "";
+        String line;
         StringBuilder stringBuilder = new StringBuilder();
         while ((line = rd.readLine()) != null) {
             stringBuilder.append(line);
@@ -69,13 +69,13 @@ public class RestConnector {
             }
             //get all data from hebdate category
             else if(dayDto.getCategory().equalsIgnoreCase(Utils.CATEGORY_OF_HEBREW_VALUE_HEBDATE)) {
-
+                dayModel.setDayNumber(day);
                 dayModel.setDateGregorian(dayDto.getDate());
                 dayModel.setHebrewDate(formatDate(dayDto.getHebrew(),true));
                 dayModel.setTitleEnglishDateHebrewCalendar(formatDate(dayDto.getTitle(),false));
                 dayModel.setYomtov(dayDto.isYomtov());
                 dayModel.setCategory(dayDto.getCategory());
-                monthModel.addDayModel(dayModel);
+                monthModel.addDayModel(day, dayModel);
                // dayCounter=dayCounter < lastDay ? dayCounter+1 : 1;
             }
         });
@@ -94,7 +94,7 @@ public class RestConnector {
         else {
             final String[] val = new String[1];
             final String tmpDate=date;
-            List<String> values = new ArrayList<String>(Arrays.asList(Utils.ENGLISH_VAL_ND,Utils.ENGLISH_VAL_RD,Utils.ENGLISH_VAL_ST,Utils.ENGLISH_VAL_TH));
+            List<String> values = new ArrayList<>(Arrays.asList(Utils.ENGLISH_VAL_ND, Utils.ENGLISH_VAL_RD, Utils.ENGLISH_VAL_ST, Utils.ENGLISH_VAL_TH));
             values.forEach(value->{
                 if(tmpDate.contains(value)){
                     val[0]=value;

@@ -1,47 +1,48 @@
 package hebcalgroupid.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 
 /**
  * Created by We on 12.11.2016.
  */
 public class YearModel implements Serializable {
-    private int year;
-    private List<MonthModel> months;
+    private int yearInt;
+    private HashMap<Integer,MonthModel> months;
 
-    public YearModel() {
-        months=new ArrayList<>();
+    private YearModel() {
+        months=new HashMap<>();
     }
 
-    public YearModel(int year) {
+    public YearModel(int yearInt) {
         this();
-        this.year = year;
+        this.yearInt = yearInt;
 
     }
 
-    ///add unique daymodel into list
-    public void addMonthModel(MonthModel monthModel){
-        if(!months.contains(monthModel)){
-            months.add(monthModel);
-        }
+    ///add unique monthModel into list
+    public void addMonthModel(int monthInt, MonthModel monthModel){
+        months.put(monthInt,monthModel);
     }
 
-    public int getYear() {
-        return year;
+    public int getYearInt() {
+        return yearInt;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setYearInt(int yearInt) {
+        this.yearInt = yearInt;
     }
 
-    public List<MonthModel> getMonths() {
+    public MonthModel getMonth(int monthNum) {
+        return months.get(monthNum);
+    }
+
+    public HashMap<Integer, MonthModel> getMonths() {
         return months;
     }
 
-    public void setMonths(List<MonthModel> months) {
+    public void setMonths(HashMap<Integer, MonthModel> months) {
         this.months = months;
     }
 }

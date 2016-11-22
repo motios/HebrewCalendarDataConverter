@@ -24,27 +24,35 @@ public class RestConnector {
 
     private int dayCounter=1;
 
-    public MonthModel connect(int year, int month) throws IOException {
+    public MonthModel connect(int year, int month) {
         HttpClient client = new DefaultHttpClient();
         HttpGet request = new HttpGet("http://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&year="+year+"&month="+month+"&d=on&D=on");
         //HttpGet request = new HttpGet("http://www.hebcal.com/hebcal/?v=1&cfg=json&maj=on&year=1975&month=4&d=on&D=on");
-        HttpResponse response = client.execute(request);
-        BufferedReader rd = new BufferedReader (new InputStreamReader(response.getEntity().getContent()));
-        String line;
-        StringBuilder stringBuilder = new StringBuilder();
-        while ((line = rd.readLine()) != null) {
-            stringBuilder.append(line);
-        }
-        ObjectMapper objectMapper  = new ObjectMapper();
+        try {
+            HttpResponse response = client.execute(request);
+            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = rd.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            ObjectMapper objectMapper = new ObjectMapper();
 
-        MonthDto monthDto = objectMapper.readValue(stringBuilder.toString(),MonthDto.class);
-        return monthDtoToModel(monthDto);
+            MonthDto monthDto = objectMapper.readValue(stringBuilder.toString(), MonthDto.class);
+            return monthDtoToModel(monthDto);
+        }catch (Exception e){
+            System.out.println("connect year: "+year+", month: "+month+" error: "+ e.getMessage());
+            return null;
+        }
+
     }
 
     private MonthModel monthDtoToModel(MonthDto monthDto) {
+
         //TODO need think for getting Yomtov flag from other category
         MonthModel monthModel= new MonthModel();
         monthDto.getItems().forEach(dayDto->{
+
             DayModel dayModel = new DayModel();
             int day=0;
             int lastDay=0;
@@ -57,16 +65,18 @@ public class RestConnector {
                 val=monthDto.getItems().get(monthDto.getItems().size()-1).getDate();
                 lastDay = Integer.valueOf(val.substring(val.length() - 2));
             }catch (Exception e){
-                System.out.println(dayDto.getCategory()+", "+dayDto.getDate()+": error: "+e.getMessage());
+                System.out.println("monthDtoToModel. date: "+dayDto.getCategory()+", "+dayDto.getDate()+": error: "+e.getMessage());
             }
             //check if day is yomtov
-            if(dayDto.getCategory().equalsIgnoreCase(Utils.CATEGORY_OF_HEBREW_VALUE_HOLIDAY)) {
-                if (dayDto.isYomtov()) {
-                    monthModel.getDays().get(monthModel.getDays().size()-1).setYomtov(dayDto.isYomtov());
-//                    dayModel.setYomtov(dayDto.isYomtov());
+            try {
+                if (dayDto.getCategory().equalsIgnoreCase(Utils.CATEGORY_OF_HEBREW_VALUE_HOLIDAY)) {
+                    if (dayDto.isYomtov()) {
+                        monthModel.getDays().get(day).setYomtov(dayDto.isYomtov());
+                    }
+
                 }
 
-            }
+
             //get all data from hebdate category
             else if(dayDto.getCategory().equalsIgnoreCase(Utils.CATEGORY_OF_HEBREW_VALUE_HEBDATE)) {
                 dayModel.setDayNumber(day);
@@ -76,7 +86,10 @@ public class RestConnector {
                 dayModel.setYomtov(dayDto.isYomtov());
                 dayModel.setCategory(dayDto.getCategory());
                 monthModel.addDayModel(day, dayModel);
-               // dayCounter=dayCounter < lastDay ? dayCounter+1 : 1;
+            }
+            }catch (Exception e){
+                System.out.println(dayDto.getDate());
+                System.out.println(e.getMessage());
             }
         });
         return monthModel;
